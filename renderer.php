@@ -36,7 +36,10 @@ class format_turforlag_renderer extends format_section_renderer_base {
      * @return string HTML to output.
      */
     protected function start_section_list() {
-        return html_writer::start_tag('ul', array('class' => 'turforlag'));
+
+        $html = html_writer::start_tag('div', array('id' => 'turforlag_wrapper'));
+        $html .= html_writer::start_tag('div', array('id' => 'tabs', 'class' => 'turforlag'));
+        return $html;
     }
 
     /**
@@ -44,7 +47,10 @@ class format_turforlag_renderer extends format_section_renderer_base {
      * @return string HTML to output.
      */
     protected function end_section_list() {
-        return html_writer::end_tag('ul');
+
+        $html = html_writer::end_tag('div');
+        $html .= html_writer::end_tag('div');
+        return $html;
     }
 
     /**
@@ -211,5 +217,84 @@ class format_turforlag_renderer extends format_section_renderer_base {
             echo $this->end_section_list();
         }
 
+    }
+
+    public function generate_turforlag_course_format_html($structure) {
+
+        echo "<script>";
+        echo "$(function() {";
+        echo "$('#tabs').tabs();";
+        foreach ($structure as $sectionid => $section) {
+            if (array_key_exists('parts', $structure[$sectionid])) {
+                echo "$('#subtabs-{$sectionid}').tabs();";
+            }
+        }
+        echo "});";
+        echo "</script>";
+
+        echo html_writer::start_div('', array('id' => 'tabs'));
+        echo $this->generate_turforlag_tabs_html($structure);
+        echo $this->generate_turforlag_tabcontent_html($structure);
+        echo html_writer::end_div();
+    }
+
+    public function generate_turforlag_tabs_html($structure) {
+
+        $html = html_writer::start_tag('ul', array('class' => 'turforlag_tabs'));
+        foreach ($structure as $sectionid => $section) {
+            $link = html_writer::link('#tabs-' . $sectionid, $section['section']);
+            $html .= html_writer::tag('li', $link, array('class' => 'progress_red')); // @TODO Dynamic progress class
+        }
+        $html .= html_writer::end_tag('ul');
+
+        return $html;
+    }
+
+    public function generate_turforlag_tabcontent_html($structure) {
+
+        $html = '';
+        foreach ($structure as $sectionid => $section) {
+            $html .= html_writer::start_div('turforlag_cf_content',
+                    array('id' => 'tabs-' . $sectionid));
+            $html .= html_writer::tag('h1', $section['section']);
+            if (array_key_exists('parts', $structure[$sectionid])) {
+                $html .= html_writer::start_div('', array('id' => 'subtabs-' . $sectionid));
+                $html .= $this->generate_turforlag_subtabs_html($structure, $sectionid);
+                $html .= $this->generate_turforlag_subtabcontent_html($structure, $sectionid);
+                $html .= html_writer::end_div();
+            }
+            $html .= html_writer::end_div();
+        }
+
+        return $html;
+    }
+
+    public function generate_turforlag_subtabs_html($structure, $sectionid) {
+
+        $html = html_writer::start_tag('ul', array('class' => 'turforlag_subtabs'));
+        foreach ($structure[$sectionid]['parts'] as $subtabid => $subtab) {
+            $link = html_writer::link("#subtabs-{$sectionid}-{$subtabid}", $subtab['name']);
+            $html .= html_writer::tag('li', $link, array('class' => 'turforlag_cf_progress_green')); // @TODO Dynamic progress class
+        }
+        $html .= html_writer::end_tag('ul');
+
+        return $html;
+    }
+
+    public function generate_turforlag_subtabcontent_html($structure, $sectionid) {
+
+        $html = '';
+        foreach ($structure[$sectionid]['parts'] as $subtabid => $subtab) {
+            $html .= html_writer::start_div('turforlag_cf_subcontent', array('id' => "subtabs-{$sectionid}-{$subtabid}"));
+            $html .= html_writer::start_tag('ul');
+            foreach ($structure[$sectionid]['parts'][$subtabid]['modules'] as $moduleid => $module) {
+                $link = html_writer::link('#subcontent', $module);
+                $html .= html_writer::tag('li', $link, array('class' => 'turforlag_cf_progress_red')); // @TODO Dynamic progress class
+            }
+            $html .= html_writer::end_tag('ul');
+            $html .= html_writer::end_div();
+        }
+
+        return $html;
     }
 }

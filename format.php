@@ -48,11 +48,12 @@ course_create_sections_if_missing($course, range(0, $course->numsections));
 
 $renderer = $PAGE->get_renderer('format_turforlag');
 
-if (!empty($displaysection)) {
-    $renderer->print_single_section_page($course, null, null, null, null, $displaysection);
-} else {
+if ($PAGE->user_is_editing()) {
     $renderer->print_multiple_section_page($course, null, null, null, null);
+} else {
+    $structure = tur_course_structure($course->id);
+    $renderer->generate_turforlag_course_format_html($structure);
 }
 
 // Include course format js module
-$PAGE->requires->js('/course/format/topics/format.js');
+$PAGE->requires->js('/course/format/turforlag/format.js');

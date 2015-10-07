@@ -328,3 +328,53 @@ class format_turforlag extends format_base {
         return $this->update_format_options($data);
     }
 }
+
+function tur_course_structure($courseid) {
+    global $DB;
+
+    $structure = array();
+
+    $sections = $DB->get_records_select('course_sections',
+            'course = ? and visible = ?', array($courseid, 1), 'section', 'section, id, summary, sequence');
+
+    foreach ($sections as $sectionid => $section) {
+
+        $structure[$sectionid]['section'] = $section->summary;
+
+        if (!$sectionid) {
+            continue;
+        }
+
+        list($sequencesql, $params) = $DB->get_in_or_equal(explode(',', $section->sequence));
+
+        $sql = "SELECT cm.id, l.name AS labelname, q.name AS quizname, s.name AS scormname
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module
+             LEFT JOIN {label} l ON (l.id = cm.instance AND m.name = 'label')
+             LEFT JOIN {quiz} q ON (q.id = cm.instance AND m.name = 'quiz')
+             LEFT JOIN {scorm} s ON (s.id = cm.instance AND m.name = 'scorm')
+                 WHERE cm.id {$sequencesql}";
+
+        $sectionmodules = $DB->get_records_sql($sql, $params);
+        $sectionmodules = array_values($sectionmodules);
+
+        for ($i = 0; $i < count($sectionmodules); $i++) {
+            if ($sectionmodules[$i]->labelname) {
+                $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->labelname;
+                $parent = $i;
+            }
+            if ($sectionmodules[$i]->quizname) {
+                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id] = $sectionmodules[$i]->quizname;
+            }
+            if ($sectionmodules[$i]->scormname) {
+                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id] = $sectionmodules[$i]->scormname;
+            }
+        }
+
+        $structure[$sectionid]['parts'] = array_values($structure[$sectionid]['parts']);
+    }
+
+    $structure = array_values($structure);
+
+    return $structure;
+}

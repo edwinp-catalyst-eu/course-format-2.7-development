@@ -7,3 +7,122 @@
 .course-content ul.turforlag li.section .right {width:40px;text-align:center;padding: 6px 0;}
 .course-content ul.turforlag li.section .right img.icon { padding: 0 0 4px 0;}
 .course-content ul.turforlag li.section .left .section-handle img.icon { padding:0; vertical-align: baseline; }
+
+
+/* TABS */
+.turforlag_tabs {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #000000;
+    display: block;
+    float: left;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    //width: 150px;
+}
+
+.turforlag_tabs li {
+    display: block;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c8e0d7;
+    margin-bottom: 10px;
+    background-color: #edf1f0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* Active tab */
+.turforlag_tabs li.ui-state-active {
+    background-color: #ffffff;
+    border-top-color: #000000;
+    border-bottom-color: #000000;
+    border-right-color: #ffffff;
+}
+
+.turforlag_tabs li a {
+    padding: 10px;
+    text-decoration: none;
+}
+
+/* SUB TABS */
+.turforlag_subtabs {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #000000;
+    display: block;
+    float: left;
+    //margin: 0 0 0 50px;
+    list-style-type: none;
+}
+
+.turforlag_subtabs li {
+    display: block;
+    border-style: solid;
+    border-width: 1px;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-color: #c8e0d7;
+}
+
+/* Active tab */
+.turforlag_subtabs li.ui-state-active {
+    background-color: #c8e0d7 !important;
+}
+
+.turforlag_subtabs li a {
+    padding: 10px;
+    text-decoration: none;
+}
+
+/* Active sub tabs */
+.turforlag_subtabs li.ui-state-active {
+    background-color: #ffffff;
+    border-top-color: #000000;
+    border-bottom-color: #000000;
+    border-right-color: #ffffff;
+}
+
+/* CONTENT */
+.turforlag_cf_content {
+    display: block;
+    width: 635px;
+    min-height: 250px;
+    border-style: solid;
+    border-width: 1px;
+    float: left;
+}
+
+.turforlag_cf_content h1 {
+    margin-bottom: 25px;
+    margin-top: 10px;
+    margin-left: 50px;
+    text-transform: uppercase;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 19.5px;
+    color: #336633;
+}
+
+/* SUB CONTENT */
+.turforlag_cf_subcontent {
+    display: block;
+    width: 200px;
+    //min-height: 250px;
+    border-style: solid;
+    border-width: 1px;
+    float: left;
+    padding: 50px;
+}
+
+/* PROGRESS HIGHLIGHTING */
+.li.turforlag_cf_progress_red {
+    border-left-width: 5px;
+    border-left-color: #ff0000;
+ }
+
+.li.turforlag_cf_progress_green {
+    border-left-width: 5px;
+    border-left-color: #00ff00;
+ }
