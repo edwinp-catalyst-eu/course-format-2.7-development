@@ -364,10 +364,12 @@ function tur_course_structure($courseid) {
                 $parent = $i;
             }
             if ($sectionmodules[$i]->quizname) {
-                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id] = $sectionmodules[$i]->quizname;
+                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->quizname;
+                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'quiz';
             }
             if ($sectionmodules[$i]->scormname) {
-                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id] = $sectionmodules[$i]->scormname;
+                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->scormname;
+                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'scorm';
             }
         }
 

@@ -288,7 +288,8 @@ class format_turforlag_renderer extends format_section_renderer_base {
             $html .= html_writer::start_div('turforlag_cf_subcontent', array('id' => "subtabs-{$sectionid}-{$subtabid}"));
             $html .= html_writer::start_tag('ul');
             foreach ($structure[$sectionid]['parts'][$subtabid]['modules'] as $moduleid => $module) {
-                $link = html_writer::link('#subcontent', $module);
+                $url = new moodle_url("/mod/{$module['type']}/view.php", array('id' => $moduleid));
+                $link = html_writer::link($url, $module['name']);
                 $html .= html_writer::tag('li', $link, array('class' => 'turforlag_cf_progress_red')); // @TODO Dynamic progress class
             }
             $html .= html_writer::end_tag('ul');
