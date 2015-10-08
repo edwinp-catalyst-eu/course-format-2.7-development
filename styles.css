@@ -10,6 +10,10 @@
 
 
 /* TABS */
+#tabs {
+    min-height: 550px;
+}
+
 .turforlag_tabs {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
@@ -19,14 +23,14 @@
     margin: 0;
     padding: 0;
     list-style-type: none;
-    //width: 150px;
+    position: relative;
+    z-index: 2;
 }
 
-.turforlag_tabs li {
+.turforlag_tabs > li {
     display: block;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #c8e0d7;
+    border: 1px solid #c8e0d7;
+    border-right: none;
     margin-bottom: 10px;
     background-color: #edf1f0;
     padding-top: 10px;
@@ -34,11 +38,12 @@
 }
 
 /* Active tab */
-.turforlag_tabs li.ui-state-active {
+.turforlag_tabs > li.ui-state-active {
     background-color: #ffffff;
-    border-top-color: #000000;
+    border-color: #336633;
     border-bottom-color: #000000;
-    border-right-color: #ffffff;
+    border-right: 1px solid #ffffff;
+    margin-right: -1px;
 }
 
 .turforlag_tabs li a {
@@ -59,30 +64,37 @@
 
 .turforlag_subtabs li {
     display: block;
-    border-style: solid;
-    border-width: 1px;
+    border: 1px solid #336633;
     margin-bottom: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border-color: #c8e0d7;
-}
-
-/* Active tab */
-.turforlag_subtabs li.ui-state-active {
-    background-color: #c8e0d7 !important;
+    padding: 0;
+    width: 220px;
+    height: 22px;
+    position: relative;
 }
 
 .turforlag_subtabs li a {
-    padding: 10px;
+    padding: 0 5px;
+    line-height: 22px;
     text-decoration: none;
 }
 
 /* Active sub tabs */
 .turforlag_subtabs li.ui-state-active {
-    background-color: #ffffff;
     border-top-color: #000000;
     border-bottom-color: #000000;
     border-right-color: #ffffff;
+    background-color: #c8e0d7;
+}
+
+.turforlag_subtabs > li.ui-state-active:after {
+    display: block;
+    content: "";
+    width: 13px;
+    height: 24px;
+    position: absolute;
+    top: -1px;
+    right: -13px;
+    background: url([[pix:format_turforlag|selectedmenu]]) no-repeat center center;
 }
 
 /* CONTENT */
@@ -90,7 +102,7 @@
     display: block;
     position: relative;
     width: 635px;
-    min-height: 250px;
+    min-height: 550px;
     border-style: solid;
     border-width: 1px;
     float: left;
@@ -110,10 +122,8 @@
 .turforlag_cf_subcontent {
     display: block;
     width: 200px;
-    border-style: solid;
-    border-width: 1px;
+    border: none;
     float: left;
-    padding: 50px;
     position: relative;
 }
 
