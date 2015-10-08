@@ -353,7 +353,15 @@ function tur_course_structure($courseid) {
              LEFT JOIN {label} l ON (l.id = cm.instance AND m.name = 'label')
              LEFT JOIN {quiz} q ON (q.id = cm.instance AND m.name = 'quiz')
              LEFT JOIN {scorm} s ON (s.id = cm.instance AND m.name = 'scorm')
-                 WHERE cm.id {$sequencesql}";
+                 WHERE cm.id {$sequencesql}
+              ORDER BY
+                    CASE cm.id ";
+
+        $sequencearray = explode(',', $section->sequence);
+        for ($i = 0; $i < count($sequencearray); $i++) {
+            $sql .= 'WHEN ' . $sequencearray[$i] . ' THEN ' . $i . ' ';
+        }
+        $sql .= 'END';
 
         $sectionmodules = $DB->get_records_sql($sql, $params);
         $sectionmodules = array_values($sectionmodules);
