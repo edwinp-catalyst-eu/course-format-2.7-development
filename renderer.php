@@ -221,17 +221,6 @@ class format_turforlag_renderer extends format_section_renderer_base {
 
     public function generate_turforlag_course_format_html($structure) {
 
-        echo "<script>";
-        echo "$(function() {";
-        echo "$('#tabs').tabs();";
-        foreach ($structure as $sectionid => $section) {
-            if (array_key_exists('parts', $structure[$sectionid])) {
-                echo "$('#subtabs-{$sectionid}').tabs();";
-            }
-        }
-        echo "});";
-        echo "</script>";
-
         echo html_writer::start_div('', array('id' => 'tabs'));
         echo $this->generate_turforlag_tabs_html($structure);
         echo $this->generate_turforlag_tabcontent_html($structure);
@@ -256,9 +245,9 @@ class format_turforlag_renderer extends format_section_renderer_base {
         foreach ($structure as $sectionid => $section) {
             $html .= html_writer::start_div('turforlag_cf_content',
                     array('id' => 'tabs-' . $sectionid));
-            $html .= html_writer::tag('h1', $section['section']);
+            $html .= html_writer::tag('h3', $section['section']);
             if (array_key_exists('parts', $structure[$sectionid])) {
-                $html .= html_writer::start_div('', array('id' => 'subtabs-' . $sectionid));
+                $html .= html_writer::start_div('', array('id' => 'subtabs-' . $sectionid, 'class' => 'turforlag_subtabs'));
                 $html .= $this->generate_turforlag_subtabs_html($structure, $sectionid);
                 $html .= $this->generate_turforlag_subtabcontent_html($structure, $sectionid);
                 $html .= html_writer::end_div();

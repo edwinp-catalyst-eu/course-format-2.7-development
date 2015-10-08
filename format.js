@@ -94,3 +94,8 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
         }
     }
 }
+
+$(function() {
+    $('#tabs').tabs();
+    $('.turforlag_subtabs').tabs();
+});
