@@ -97,5 +97,9 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
 
 $(function() {
     $('#tabs').tabs();
-    $('.turforlag_subtabs').tabs();
+    $('.turforlag_subtabs').tabs({
+        activate: function(e, ui) {
+            ui.newPanel.css('margin-top', ui.newTab.position().top);
+        }
+    });
 });
