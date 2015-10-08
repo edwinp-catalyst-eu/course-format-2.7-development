@@ -330,7 +330,7 @@ class format_turforlag extends format_base {
 }
 
 function tur_course_structure($courseid) {
-    global $DB;
+    global $DB, $USER;
 
     $structure = array();
 
@@ -366,6 +366,19 @@ function tur_course_structure($courseid) {
             if ($sectionmodules[$i]->quizname) {
                 $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->quizname;
                 $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'quiz';
+                $grade = $DB->get_field('quiz_grades', 'grade', array('quiz' => $sectionmodules[$i]->id, 'userid' => $USER->id));
+                switch ((int) $grade) {
+                    case (0) :
+                        $status = 'red';
+                        break;
+                    case ($grade >= 8) :
+                        $status = 'green';
+                        break;
+                    default :
+                        $status = 'yellow';
+                        break;
+                }
+                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = $status;
             }
             if ($sectionmodules[$i]->scormname) {
                 $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->scormname;
