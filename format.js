@@ -98,7 +98,7 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
 $(function() {
     var activetabs = window.location.hash.split("-");
     var toptab = 0;
-    var subtab = 0;
+    var subtab = false;
 
     if (activetabs[0] == "#subtabs") {
         if (activetabs[1] != null) {
@@ -115,7 +115,7 @@ $(function() {
 
     $('.turforlag_subtabs').tabs({
         active: subtab,
-        disabled: [0],
+        collapsible: true,
         activate: function(e, ui) {
             ui.newPanel.css('margin-top', ui.newTab.position().top);
         },
