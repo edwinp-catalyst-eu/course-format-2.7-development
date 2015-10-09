@@ -96,10 +96,32 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
 }
 
 $(function() {
-    $('#tabs').tabs();
+    var activetabs = window.location.hash.split("-");
+    var toptab = 0;
+    var subtab = 0;
+
+    if (activetabs[0] == "#subtabs") {
+        if (activetabs[1] != null) {
+            toptab = activetabs[1];
+        }
+        if (activetabs[2] != null) {
+            subtab = activetabs[2];
+        }
+    }
+
+    $('#tabs').tabs({
+        active: toptab
+    });
+
     $('.turforlag_subtabs').tabs({
+        active: subtab,
         activate: function(e, ui) {
             ui.newPanel.css('margin-top', ui.newTab.position().top);
+        },
+        create: function(e, ui) {
+            if (ui.tab.position()) {
+                ui.panel.css('margin-top', ui.tab.position().top);
+            }
         }
     });
 });
