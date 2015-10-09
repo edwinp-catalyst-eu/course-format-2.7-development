@@ -115,12 +115,27 @@ $(function() {
 
     $('.turforlag_subtabs').tabs({
         active: subtab,
+        disabled: [0],
         activate: function(e, ui) {
             ui.newPanel.css('margin-top', ui.newTab.position().top);
         },
         create: function(e, ui) {
             if (ui.tab.position()) {
                 ui.panel.css('margin-top', ui.tab.position().top);
+            }
+            if (ui.tab.hasClass('turforlag_directlink')) {
+                e.preventDefault();
+            }
+        },
+        beforeLoad: function(e, ui) {
+            if (ui.tab.hasClass('turforlag_directlink')) {
+                e.preventDefault();
+            }
+        },
+        beforeActivate: function(e, ui) {
+            if (ui.newTab.hasClass('turforlag_directlink')) {
+                e.preventDefault();
+                window.location.href = ui.newTab.find('a').attr('href');
             }
         }
     });

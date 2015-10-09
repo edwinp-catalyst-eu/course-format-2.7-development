@@ -263,14 +263,16 @@ class format_turforlag_renderer extends format_section_renderer_base {
 
         $html = html_writer::start_tag('ul', array('class' => 'turforlag_subtabs'));
         foreach ($structure[$sectionid]['parts'] as $subtabid => $subtab) {
+            $class = 'turforlag_cf_progress_green'; // @TODO Dynamic progress class
             if (!isset($subtab['modules'])) {
                 $url = new moodle_url("/mod/{$subtab['type']}/view.php", array('id' => $subtab['moduleid']));
-                $link = html_writer::link($url, $subtab['name'], array('class' => 'turforlag_directlink'));
+                $link = html_writer::link($url, $subtab['name']);
+                $class .= ' turforlag_directlink';
             } else {
                 $url = "#subtabs-{$sectionid}-{$subtabid}";
                 $link = html_writer::link($url, $subtab['name']);
             }
-            $html .= html_writer::tag('li', $link, array('class' => 'turforlag_cf_progress_green')); // @TODO Dynamic progress class
+            $html .= html_writer::tag('li', $link, array('class' => $class));
         }
         $html .= html_writer::end_tag('ul');
 
