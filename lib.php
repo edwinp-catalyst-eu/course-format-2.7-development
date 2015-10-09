@@ -335,66 +335,93 @@ function tur_course_structure($courseid) {
     $structure = array();
 
     $sections = $DB->get_records_select('course_sections',
-            'course = ? and visible = ?', array($courseid, 1), 'section', 'section, id, summary, sequence');
+            "course = ? and visible = ? AND summary <> ''",
+            array($courseid, 1), 'section', 'section, id, summary, sequence');
 
     foreach ($sections as $sectionid => $section) {
 
         $structure[$sectionid]['section'] = $section->summary;
+        $structure[$sectionid]['status'] = 'red'; // @TODO Dynamic progress class
 
         if (!$sectionid) {
             continue;
         }
 
-        list($sequencesql, $params) = $DB->get_in_or_equal(explode(',', $section->sequence));
+        if (isset($section->sequence) && $section->sequence) {
 
-        $sql = "SELECT cm.id, l.name AS labelname, q.name AS quizname, s.name AS scormname
-                  FROM {course_modules} cm
-                  JOIN {modules} m ON m.id = cm.module
-             LEFT JOIN {label} l ON (l.id = cm.instance AND m.name = 'label')
-             LEFT JOIN {quiz} q ON (q.id = cm.instance AND m.name = 'quiz')
-             LEFT JOIN {scorm} s ON (s.id = cm.instance AND m.name = 'scorm')
-                 WHERE cm.id {$sequencesql}
-              ORDER BY
-                    CASE cm.id ";
+            list($sequencesql, $params) = $DB->get_in_or_equal(explode(',', $section->sequence));
 
-        $sequencearray = explode(',', $section->sequence);
-        for ($i = 0; $i < count($sequencearray); $i++) {
-            $sql .= 'WHEN ' . $sequencearray[$i] . ' THEN ' . $i . ' ';
-        }
-        $sql .= 'END';
+            $sql = "SELECT cm.id, cm.indent,
+                            l.name AS labelname,
+                            q.name AS quizname,
+                            s.name AS scormname
+                      FROM {course_modules} cm
+                      JOIN {modules} m ON m.id = cm.module
+                 LEFT JOIN {label} l ON (l.id = cm.instance AND m.name = 'label')
+                 LEFT JOIN {quiz} q ON (q.id = cm.instance AND m.name = 'quiz')
+                 LEFT JOIN {scorm} s ON (s.id = cm.instance AND m.name = 'scorm')
+                     WHERE cm.id {$sequencesql} ";
 
-        $sectionmodules = $DB->get_records_sql($sql, $params);
-        $sectionmodules = array_values($sectionmodules);
-
-        for ($i = 0; $i < count($sectionmodules); $i++) {
-            if ($sectionmodules[$i]->labelname) {
-                $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->labelname;
-                $parent = $i;
+            $sql .=  " ORDER BY CASE cm.id ";
+            $sequencearray = explode(',', $section->sequence);
+            for ($i = 0; $i < count($sequencearray); $i++) {
+                $sql .= 'WHEN ' . $sequencearray[$i] . ' THEN ' . $i . ' ';
             }
-            if ($sectionmodules[$i]->quizname) {
-                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->quizname;
-                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'quiz';
-                $grade = $DB->get_field('quiz_grades', 'grade', array('quiz' => $sectionmodules[$i]->id, 'userid' => $USER->id));
-                switch ((int) $grade) {
-                    case (0) :
-                        $status = 'red';
+            $sql .= 'END';
+
+            $sectionmodules = $DB->get_records_sql($sql, $params);
+            $sectionmodules = array_values($sectionmodules);
+
+            for ($i = 0; $i < count($sectionmodules); $i++) {
+
+                switch ($sectionmodules[$i]->indent) {
+                    case 0:
+                        if ($sectionmodules[$i]->labelname) {
+                            $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->labelname;
+                            $structure[$sectionid]['parts'][$i]['type'] = 'label';
+                            $structure[$sectionid]['parts'][$i]['status'] = 'red'; // @TODO Dynamic progress class
+                            $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
+                        }
+                        if ($sectionmodules[$i]->quizname) {
+                            $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->quizname;
+                            $structure[$sectionid]['parts'][$i]['type'] = 'quiz';
+                            $structure[$sectionid]['parts'][$i]['status'] = 'red'; // @TODO Dynamic progress class
+                            $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
+                        }
+                        if ($sectionmodules[$i]->scormname) {
+                            $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->scormname;
+                            $structure[$sectionid]['parts'][$i]['type'] = 'scorm';
+                            $structure[$sectionid]['parts'][$i]['status'] = 'red'; // @TODO Dynamic progress class
+                            $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
+                        }
+                        $parent = $i;
                         break;
-                    case ($grade >= 8) :
-                        $status = 'green';
-                        break;
-                    default :
-                        $status = 'yellow';
+                    case 1:
+                        if (!isset($parent)) {
+                            $parent = $i;
+                        }
+                        if ($sectionmodules[$i]->labelname) {
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->labelname;
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'label';
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = 'red'; // @TODO Dynamic progress class
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['moduleid'] = $sectionmodules[$i]->id;
+                        }
+                        if ($sectionmodules[$i]->quizname) {
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->quizname;
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'quiz';
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = 'red'; // @TODO Dynamic progress class
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['moduleid'] = $sectionmodules[$i]->id;
+                        }
+                        if ($sectionmodules[$i]->scormname) {
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->scormname;
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'scorm';
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = 'red'; // @TODO Dynamic progress class
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['moduleid'] = $sectionmodules[$i]->id;
+                        }
                         break;
                 }
-                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = $status;
-            }
-            if ($sectionmodules[$i]->scormname) {
-                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->scormname;
-                $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'scorm';
             }
         }
-
-        $structure[$sectionid]['parts'] = array_values($structure[$sectionid]['parts']);
     }
 
     $structure = array_values($structure);
