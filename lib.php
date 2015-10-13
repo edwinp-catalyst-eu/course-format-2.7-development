@@ -341,7 +341,6 @@ function tur_course_structure($courseid) {
     foreach ($sections as $sectionid => $section) {
 
         $structure[$sectionid]['section'] = $section->summary;
-        $structure[$sectionid]['status'] = 'red'; // @TODO Dynamic progress class
 
         if (!$sectionid) {
             continue;
@@ -396,19 +395,40 @@ function tur_course_structure($courseid) {
                         if ($sectionmodules[$i]->labelname) {
                             $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->labelname;
                             $structure[$sectionid]['parts'][$i]['type'] = 'label';
-                            $structure[$sectionid]['parts'][$i]['status'] = 'red'; // @TODO Dynamic progress class
                             $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
                         }
                         if ($sectionmodules[$i]->quizname) {
                             $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->quizname;
                             $structure[$sectionid]['parts'][$i]['type'] = 'quiz';
-                            $structure[$sectionid]['parts'][$i]['status'] = $sectionmodules[$i]->quizstate;
+                            switch ($sectionmodules[$i]->quizstate) {
+                                case 'finished':
+                                    $quizstate = 'completed';
+                                    break;
+                                case 'inprogress':
+                                    $quizstate = 'inprogress';
+                                    break;
+                                default:
+                                    $quizstate = 'unstarted';
+                                    break;
+                            }
+                            $structure[$sectionid]['parts'][$i]['status'] = $quizstate;
                             $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
                         }
                         if ($sectionmodules[$i]->scormname) {
                             $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->scormname;
                             $structure[$sectionid]['parts'][$i]['type'] = 'scorm';
-                            $structure[$sectionid]['parts'][$i]['status'] = $sectionmodules[$i]->scormstate;
+                            switch ($sectionmodules[$i]->scormstate) {
+                                case 'completed':
+                                    $scormstate = 'completed';
+                                    break;
+                                case 'incomplete':
+                                    $scormstate = 'inprogress';
+                                    break;
+                                default:
+                                    $scormstate = 'unstarted';
+                                    break;
+                            }
+                            $structure[$sectionid]['parts'][$i]['status'] = $scormstate;
                             $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
                         }
                         $parent = $i;
@@ -416,12 +436,6 @@ function tur_course_structure($courseid) {
                     case 1:
                         if (!isset($parent)) {
                             $parent = $i;
-                        }
-                        if ($sectionmodules[$i]->labelname) {
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->labelname;
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'label';
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = 'red'; // @TODO Dynamic progress class
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['moduleid'] = $sectionmodules[$i]->id;
                         }
                         if ($sectionmodules[$i]->quizname) {
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->quizname;
@@ -437,6 +451,74 @@ function tur_course_structure($courseid) {
                         }
                         break;
                 }
+            }
+
+            foreach ($structure[$sectionid]['parts'] as $sectionpartid => $sectionpart) {
+
+                if (array_key_exists('modules', $sectionpart)) {
+
+                    $inprogressmodules = array();
+                    $completedmodules = array();
+                    $unstartedmodules = array();
+
+                    foreach ($sectionpart['modules'] as $sectionpartmoduleid => $sectionpartmodule) {
+                        switch ($sectionpartmodule['status']) {
+                            case 'inprogress':
+                                $inprogressmodules[] = $sectionpartmoduleid;
+                                break;
+                            case 'completed':
+                                $completedmodules[] = $sectionpartmoduleid;
+                                break;
+                            default:
+                                $unstartedmodules[] = $sectionpartmoduleid;
+                                break;
+                        }
+                    }
+
+                    if (count($completedmodules) == count($sectionpart['modules'])) {
+                        $status = 'completed';
+                    } else if (count($unstartedmodules) == count($sectionpart['modules'])) {
+                        $status = 'unstarted';
+                    } else {
+                        $status = 'inprogress';
+                    }
+
+                    $structure[$sectionid]['parts'][$sectionpartid]['status'] = $status;
+                }
+            }
+        }
+
+        foreach ($structure as $section) {
+
+            if (array_key_exists('parts', $section)) { // section has parts
+
+                $inprogresssections = array();
+                $completedsections = array();
+                $unstartedsections = array();
+
+                foreach ($section['parts'] as $partid => $part) {
+                    switch ($part['status']) {
+                        case 'inprogress':
+                            $inprogresssections[] = $partid;
+                            break;
+                        case 'completed':
+                            $completedsections[] = $partid;
+                            break;
+                        default:
+                            $unstartedsections[] = $partid;
+                            break;
+                    }
+                }
+
+                if (count($completedsections) == count($section['parts'])) {
+                    $status = 'completed';
+                } else if (count($unstartedsections) == count($section['parts'])) {
+                    $status = 'unstarted';
+                } else {
+                    $status = 'inprogress';
+                }
+
+                $structure[$sectionid]['status'] = $status;
             }
         }
     }
