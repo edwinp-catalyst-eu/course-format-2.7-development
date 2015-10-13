@@ -354,20 +354,29 @@ function tur_course_structure($courseid) {
             $sql = "SELECT cm.id, cm.indent,
                             l.name AS labelname,
                             q.name AS quizname,
-                            s.name AS scormname,
                             qa.attempt AS quizattempt,
                             CASE
                                 WHEN qa.state IS NOT NULL THEN
                                     qa.state
                                 WHEN qa.state IS NULL AND q.name IS NOT NULL THEN
                                     'unstarted'
-                            END AS quizstate
+                            END AS quizstate,
+                            s.name AS scormname,
+                            CASE
+                                WHEN sst.value IS NOT NULL THEN
+                                    sst.value
+                                WHEN sst.value IS NULL AND s.name IS NOT NULL THEN
+                                    'unstarted'
+                            END AS scormstate
                       FROM {course_modules} cm
                       JOIN {modules} m ON m.id = cm.module
                  LEFT JOIN {label} l ON (l.id = cm.instance AND m.name = 'label')
                  LEFT JOIN {quiz} q ON (q.id = cm.instance AND m.name = 'quiz')
                  LEFT JOIN {quiz_attempts} qa ON (qa.quiz = q.id AND qa.userid = {$USER->id})
                  LEFT JOIN {scorm} s ON (s.id = cm.instance AND m.name = 'scorm')
+                 LEFT JOIN {scorm_scoes_track} sst ON (sst.scormid = s.id
+                                AND sst.element = 'cmi.core.lesson_status'
+                                AND sst.userid = {$USER->id})
                      WHERE cm.id {$sequencesql} ";
 
             $sql .=  " ORDER BY CASE cm.id ";
@@ -393,13 +402,13 @@ function tur_course_structure($courseid) {
                         if ($sectionmodules[$i]->quizname) {
                             $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->quizname;
                             $structure[$sectionid]['parts'][$i]['type'] = 'quiz';
-                            $structure[$sectionid]['parts'][$i]['status'] = 'red'; // @TODO Dynamic progress class
+                            $structure[$sectionid]['parts'][$i]['status'] = $sectionmodules[$i]->quizstate;
                             $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
                         }
                         if ($sectionmodules[$i]->scormname) {
                             $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->scormname;
                             $structure[$sectionid]['parts'][$i]['type'] = 'scorm';
-                            $structure[$sectionid]['parts'][$i]['status'] = 'red'; // @TODO Dynamic progress class
+                            $structure[$sectionid]['parts'][$i]['status'] = $sectionmodules[$i]->scormstate;
                             $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
                         }
                         $parent = $i;
@@ -423,7 +432,7 @@ function tur_course_structure($courseid) {
                         if ($sectionmodules[$i]->scormname) {
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->scormname;
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'scorm';
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = 'red'; // @TODO Dynamic progress class
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = $sectionmodules[$i]->scormstate;
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['moduleid'] = $sectionmodules[$i]->id;
                         }
                         break;
