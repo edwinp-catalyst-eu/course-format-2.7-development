@@ -354,11 +354,19 @@ function tur_course_structure($courseid) {
             $sql = "SELECT cm.id, cm.indent,
                             l.name AS labelname,
                             q.name AS quizname,
-                            s.name AS scormname
+                            s.name AS scormname,
+                            qa.attempt AS quizattempt,
+                            CASE
+                                WHEN qa.state IS NOT NULL THEN
+                                    qa.state
+                                WHEN qa.state IS NULL AND q.name IS NOT NULL THEN
+                                    'unstarted'
+                            END AS quizstate
                       FROM {course_modules} cm
                       JOIN {modules} m ON m.id = cm.module
                  LEFT JOIN {label} l ON (l.id = cm.instance AND m.name = 'label')
                  LEFT JOIN {quiz} q ON (q.id = cm.instance AND m.name = 'quiz')
+                 LEFT JOIN {quiz_attempts} qa ON (qa.quiz = q.id AND qa.userid = {$USER->id})
                  LEFT JOIN {scorm} s ON (s.id = cm.instance AND m.name = 'scorm')
                      WHERE cm.id {$sequencesql} ";
 
@@ -409,7 +417,7 @@ function tur_course_structure($courseid) {
                         if ($sectionmodules[$i]->quizname) {
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->quizname;
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'quiz';
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = 'red'; // @TODO Dynamic progress class
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = $sectionmodules[$i]->quizstate;
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['moduleid'] = $sectionmodules[$i]->id;
                         }
                         if ($sectionmodules[$i]->scormname) {
