@@ -173,12 +173,13 @@
 
 .turforlag_cf_tabbackground_image {
     float: left;
+    margin-left: 40px;
 }
 
 .turforlag_cf_tabbackground_text {
     font-family: Arial,Helvetica,sans-serif;
     font-size: 13px;
     line-height: 16px;
-    margin-left: 170px;
+    margin-left: 220px;
     margin-right: 20px;
 }
