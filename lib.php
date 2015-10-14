@@ -453,37 +453,38 @@ function tur_course_structure($courseid) {
                 }
             }
 
-            foreach ($structure[$sectionid]['parts'] as $sectionpartid => $sectionpart) {
+            if (isset($structure[$sectionid]['parts'])) {
+                foreach ($structure[$sectionid]['parts'] as $sectionpartid => $sectionpart) {
+                    if (array_key_exists('modules', $sectionpart)) {
 
-                if (array_key_exists('modules', $sectionpart)) {
+                        $inprogressmodules = array();
+                        $completedmodules = array();
+                        $unstartedmodules = array();
 
-                    $inprogressmodules = array();
-                    $completedmodules = array();
-                    $unstartedmodules = array();
-
-                    foreach ($sectionpart['modules'] as $sectionpartmoduleid => $sectionpartmodule) {
-                        switch ($sectionpartmodule['status']) {
-                            case 'inprogress':
-                                $inprogressmodules[] = $sectionpartmoduleid;
-                                break;
-                            case 'completed':
-                                $completedmodules[] = $sectionpartmoduleid;
-                                break;
-                            default:
-                                $unstartedmodules[] = $sectionpartmoduleid;
-                                break;
+                        foreach ($sectionpart['modules'] as $sectionpartmoduleid => $sectionpartmodule) {
+                            switch ($sectionpartmodule['status']) {
+                                case 'inprogress':
+                                    $inprogressmodules[] = $sectionpartmoduleid;
+                                    break;
+                                case 'completed':
+                                    $completedmodules[] = $sectionpartmoduleid;
+                                    break;
+                                default:
+                                    $unstartedmodules[] = $sectionpartmoduleid;
+                                    break;
+                            }
                         }
-                    }
 
-                    if (count($completedmodules) == count($sectionpart['modules'])) {
-                        $status = 'completed';
-                    } else if (count($unstartedmodules) == count($sectionpart['modules'])) {
-                        $status = 'unstarted';
-                    } else {
-                        $status = 'inprogress';
-                    }
+                        if (count($completedmodules) == count($sectionpart['modules'])) {
+                            $status = 'completed';
+                        } else if (count($unstartedmodules) == count($sectionpart['modules'])) {
+                            $status = 'unstarted';
+                        } else {
+                            $status = 'inprogress';
+                        }
 
-                    $structure[$sectionid]['parts'][$sectionpartid]['status'] = $status;
+                        $structure[$sectionid]['parts'][$sectionpartid]['status'] = $status;
+                    }
                 }
             }
         }
