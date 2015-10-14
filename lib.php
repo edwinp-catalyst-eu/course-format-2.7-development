@@ -350,6 +350,27 @@ function tur_get_course_intro($courseid) {
             array('course' => $courseid, 'name' => '_introduction'));
 }
 
+function turforlag_tabcontent_background_style() {
+
+    $inlinestyle = '';
+    $styles = array(
+        'background-image' => turforlag_tabcontent_background_img(),
+        'background-position' => 'right bottom',
+        'background-repeat' => 'no-repeat'
+    );
+    foreach ($styles as $stylename => $stylevalue) {
+        $inlinestyle .= $stylename . ': ' . $stylevalue . ';';
+    }
+
+    return $inlinestyle;
+}
+
+function turforlag_tabcontent_background_img() {
+
+    // temporary development url
+    return 'url(http://staging27.turteori.dk/pluginfile.php/3280/mod_resource/content/1/backgroundstruck-2.png);';
+}
+
 function tur_course_structure($courseid) {
     global $DB, $USER;
 

@@ -246,7 +246,10 @@ class format_turforlag_renderer extends format_section_renderer_base {
         $html = '';
         foreach ($structure as $sectionid => $section) {
             $html .= html_writer::start_div('turforlag_cf_content',
-                    array('id' => 'tabs-' . $sectionid));
+                    array(
+                        'id' => 'tabs-' . $sectionid,
+                        'style' => turforlag_tabcontent_background_style()
+                    ));
             $html .= html_writer::tag('h3', $section['section']);
             if ($sectionid == 0) {
                 if ((isset($structure[0]['intromodulecontextid']) && $structure[0]['intromodulecontextid'])) {
