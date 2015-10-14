@@ -170,3 +170,15 @@
 .turforlag_status_completed a {
     border-left: 5px solid #336633;
 }
+
+.turforlag_cf_tabbackground_image {
+    float: left;
+}
+
+.turforlag_cf_tabbackground_text {
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 13px;
+    line-height: 16px;
+    margin-left: 170px;
+    margin-right: 20px;
+}

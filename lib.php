@@ -329,20 +329,57 @@ class format_turforlag extends format_base {
     }
 }
 
+function tur_get_course_intro_image($contextid) {
+
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($contextid, 'mod_resource', 'content', 0);
+
+    if ($file = end($files)) {
+        $filename = $file->get_filename();
+        if ($filename != '.') {
+            return moodle_url::make_file_url('/pluginfile.php',
+                    "/{$contextid}/mod_resource/content/0/{$filename}");
+        }
+    }
+}
+
+function tur_get_course_intro($courseid) {
+    global $DB;
+
+    return $DB->get_field('resource', 'intro',
+            array('course' => $courseid, 'name' => '_introduction'));
+}
+
 function tur_course_structure($courseid) {
     global $DB, $USER;
-
-    $structure = array();
 
     $sections = $DB->get_records_select('course_sections',
             "course = ? and visible = ? AND summary <> ''",
             array($courseid, 1), 'section', 'section, id, summary, sequence');
+    $sections = array_values($sections);
 
+    $structure = array();
     foreach ($sections as $sectionid => $section) {
-
         $structure[$sectionid]['section'] = $section->summary;
+        if ($sectionid == 0) {
+            list($sequencesql, $params) = $DB->get_in_or_equal(explode(',', $section->sequence), SQL_PARAMS_NAMED);
+            $sql = "SELECT c.id AS intromodulecontextid
+                      FROM {context} c
+                      JOIN {course_modules} cm ON cm.id = c.instanceid
+                      JOIN {modules} m ON m.id = cm.module
+                      JOIN {resource} r ON r.id = cm.instance
+                     WHERE c.contextlevel = :contextlevel
+                       AND m.name = :modulename
+                       AND r.name = :resourcename
+                       AND c.instanceid {$sequencesql}";
+            $params['contextlevel'] = CONTEXT_MODULE;
+            $params['modulename'] = 'resource';
+            $params['resourcename'] = '_introduction';
 
-        if (!$sectionid) {
+            $structure[0]['courseid'] = $courseid;
+            if ($intromodulecontextid = $DB->get_field_sql($sql, $params)) {
+                $structure[0]['intromodulecontextid'] = $intromodulecontextid;
+            }
             continue;
         }
 

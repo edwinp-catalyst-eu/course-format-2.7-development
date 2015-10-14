@@ -248,6 +248,19 @@ class format_turforlag_renderer extends format_section_renderer_base {
             $html .= html_writer::start_div('turforlag_cf_content',
                     array('id' => 'tabs-' . $sectionid));
             $html .= html_writer::tag('h3', $section['section']);
+            if ($sectionid == 0) {
+                if ((isset($structure[0]['intromodulecontextid']) && $structure[0]['intromodulecontextid'])) {
+                    if ($introimgurl = tur_get_course_intro_image($structure[0]['intromodulecontextid'])) {
+                        $introimg = html_writer::empty_tag('img', array('src' => $introimgurl));
+                        $html .= html_writer::div($introimg, 'turforlag_cf_tabbackground_image');
+                    }
+                }
+                if (isset($structure[0]['courseid']) && $structure[0]['courseid']) {
+                    if ($introhtml = tur_get_course_intro($structure[0]['courseid'])) {
+                        $html .= html_writer::div($introhtml, 'turforlag_cf_tabbackground_text');
+                    }
+                }
+            }
             if (array_key_exists('parts', $structure[$sectionid])) {
                 $attributes = array('id' => 'subtabs-' . $sectionid);
                 $html .= html_writer::start_div('',
