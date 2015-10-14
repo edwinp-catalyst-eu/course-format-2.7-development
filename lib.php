@@ -413,7 +413,8 @@ function tur_course_structure($courseid) {
                  LEFT JOIN {scorm_scoes_track} sst ON (sst.scormid = s.id
                                 AND sst.element = 'cmi.core.lesson_status'
                                 AND sst.userid = {$USER->id})
-                     WHERE cm.id {$sequencesql} ";
+                     WHERE cm.id {$sequencesql}
+                       AND cm.visible = 1 ";
 
             $sql .=  " ORDER BY CASE cm.id ";
             $sequencearray = explode(',', $section->sequence);
