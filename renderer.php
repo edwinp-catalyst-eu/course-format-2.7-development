@@ -232,7 +232,9 @@ class format_turforlag_renderer extends format_section_renderer_base {
         $html = html_writer::start_tag('ul', array('class' => 'turforlag_tabs'));
         foreach ($structure as $sectionid => $section) {
             $link = html_writer::link('#tabs-' . $sectionid, $section['section']);
-            $html .= html_writer::tag('li', $link, array('class' => 'progress_red')); // @TODO Dynamic progress class
+            $sectionstatus = (isset($section['status'])) ? $section['status'] : 'none';
+            $html .= html_writer::tag('li', $link,
+                    array('class' => 'turforlag_status_' . $sectionstatus));
         }
         $html .= html_writer::end_tag('ul');
 
@@ -248,7 +250,8 @@ class format_turforlag_renderer extends format_section_renderer_base {
             $html .= html_writer::tag('h3', $section['section']);
             if (array_key_exists('parts', $structure[$sectionid])) {
                 $attributes = array('id' => 'subtabs-' . $sectionid);
-                $html .= html_writer::start_div('', array('id' => 'subtabs-' . $sectionid, 'class' => 'turforlag_subtabs'));
+                $html .= html_writer::start_div('',
+                        array('id' => 'subtabs-' . $sectionid, 'class' => 'turforlag_subtabs'));
                 $html .= $this->generate_turforlag_subtabs_html($structure, $sectionid);
                 $html .= $this->generate_turforlag_subtabcontent_html($structure, $sectionid);
                 $html .= html_writer::end_div();
@@ -263,9 +266,10 @@ class format_turforlag_renderer extends format_section_renderer_base {
 
         $html = html_writer::start_tag('ul', array('class' => 'turforlag_subtabs'));
         foreach ($structure[$sectionid]['parts'] as $subtabid => $subtab) {
-            $class = 'turforlag_cf_progress_green'; // @TODO Dynamic progress class
+            $class = 'turforlag_status_' . $subtab['status'];
             if (!isset($subtab['modules'])) {
-                $url = new moodle_url("/mod/{$subtab['type']}/view.php", array('id' => $subtab['moduleid']));
+                $url = new moodle_url("/mod/{$subtab['type']}/view.php",
+                        array('id' => $subtab['moduleid']));
                 $link = html_writer::link($url, $subtab['name']);
                 $class .= ' turforlag_directlink';
             } else {
@@ -283,13 +287,16 @@ class format_turforlag_renderer extends format_section_renderer_base {
 
         $html = '';
         foreach ($structure[$sectionid]['parts'] as $subtabid => $subtab) {
-            $html .= html_writer::start_div('turforlag_cf_subcontent', array('id' => "subtabs-{$sectionid}-{$subtabid}"));
+            $html .= html_writer::start_div('turforlag_cf_subcontent',
+                    array('id' => "subtabs-{$sectionid}-{$subtabid}"));
             $html .= html_writer::start_tag('ul');
             if (isset($structure[$sectionid]['parts'][$subtabid]['modules'])) {
                 foreach ($structure[$sectionid]['parts'][$subtabid]['modules'] as $moduleid => $module) {
-                    $url = new moodle_url("/mod/{$module['type']}/view.php", array('id' => $moduleid));
+                    $url = new moodle_url("/mod/{$module['type']}/view.php",
+                            array('id' => $moduleid));
                     $link = html_writer::link($url, $module['name']);
-                    $html .= html_writer::tag('li', $link, array('class' => 'turforlag_cf_progress_red')); // @TODO Dynamic progress class
+                    $html .= html_writer::tag('li', $link,
+                            array('class' => 'turforlag_status_' . $module['status']));
                 }
             }
             $html .= html_writer::end_tag('ul');

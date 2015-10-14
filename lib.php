@@ -490,7 +490,7 @@ function tur_course_structure($courseid) {
 
         foreach ($structure as $section) {
 
-            if (array_key_exists('parts', $section)) { // section has parts
+            if (array_key_exists('parts', $section)) {
 
                 $inprogresssections = array();
                 $completedsections = array();
