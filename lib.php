@@ -408,7 +408,7 @@ function tur_course_structure($courseid) {
 
             list($sequencesql, $params) = $DB->get_in_or_equal(explode(',', $section->sequence));
 
-            $sql = "SELECT cm.id, cm.indent,
+            $sql = "SELECT DISTINCT cm.id, cm.indent,
                             l.name AS labelname,
                             q.name AS quizname,
                             qa.attempt AS quizattempt,
