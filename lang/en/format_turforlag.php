@@ -30,3 +30,7 @@ $string['page-course-view-topics'] = 'Any course main page in topics format';
 $string['page-course-view-topics-x'] = 'Any course page in topics format';
 $string['hidefromothers'] = 'Hide topic';
 $string['showfromothers'] = 'Show topic';
+
+$string['no-section-parts-0'] = 'Kørelektion';
+$string['no-section-parts-1'] = 'I en kørelektion prøver du den gennemgåede teori af i praksis sammen med din kørelærer.';
+$string['no-section-parts-2'] = 'Lektionen er taget med i oversigten for at vise hele forløbet af uddannelsen.';

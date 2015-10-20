@@ -31,7 +31,6 @@
 
 .turforlag_tabs > li {
     display: block;
-    line-height: 16px;
     border: 1px solid #c8e0d7;
     border-right: none;
     margin-left: 10px;
@@ -137,6 +136,10 @@
     color: #336633;
 }
 
+.turforlag_cf_content p {
+    margin-left: 40px;
+}
+
 /* SUB CONTENT */
 .turforlag_cf_subcontent {
     display: block;
@@ -156,8 +159,8 @@
 
 /* PROGRESS HIGHLIGHTING */
 
-.turforlag_status_none {
-
+.turforlag_status_none a {
+    border-left: 5px solid #bdbdbd;
 }
 
 .turforlag_status_unstarted a {

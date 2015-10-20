@@ -397,6 +397,7 @@ function tur_course_structure($courseid) {
             $params['modulename'] = 'resource';
             $params['resourcename'] = '_introduction';
 
+            $structure[0]['status'] = 'intro';
             $structure[0]['courseid'] = $courseid;
             if ($intromodulecontextid = $DB->get_field_sql($sql, $params)) {
                 $structure[0]['intromodulecontextid'] = $intromodulecontextid;
@@ -579,6 +580,9 @@ function tur_course_structure($courseid) {
                 }
 
                 $structure[$sectionid]['status'] = $status;
+            } else {
+
+                $structure[$sectionid]['status'] = 'none';
             }
         }
     }

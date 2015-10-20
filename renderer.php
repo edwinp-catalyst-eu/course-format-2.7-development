@@ -232,9 +232,19 @@ class format_turforlag_renderer extends format_section_renderer_base {
         $html = html_writer::start_tag('ul', array('class' => 'turforlag_tabs'));
         foreach ($structure as $sectionid => $section) {
             $link = html_writer::link('#tabs-' . $sectionid, $section['section']);
-            $sectionstatus = (isset($section['status'])) ? $section['status'] : 'none';
+            $totaltabs = count($structure);
+            if ($totaltabs >= 26) {
+                $lineheight = '4px';
+            } else if ($totaltabs >= 21) {
+                $lineheight = '9px';
+            } else {
+                $lineheight = '13px';
+            }
             $html .= html_writer::tag('li', $link,
-                    array('class' => 'turforlag_status_' . $sectionstatus));
+                        array(
+                            'class' => 'turforlag_status_' . $section['status'],
+                            'style' => 'line-height: ' . $lineheight .';'
+                        ));
         }
         $html .= html_writer::end_tag('ul');
 
@@ -250,7 +260,10 @@ class format_turforlag_renderer extends format_section_renderer_base {
                         'id' => 'tabs-' . $sectionid,
                         'style' => turforlag_tabcontent_background_style()
                     ));
-            $html .= html_writer::tag('h3', $section['section']);
+            $title = ($sectionid !=0 &&
+                    !array_key_exists('parts', $structure[$sectionid])) ?
+                    ' - ' . get_string('no-section-parts-0', 'format_turforlag') : '';
+            $html .= html_writer::tag('h3', $section['section'] . $title);
             if ($sectionid == 0) {
                 if ((isset($structure[0]['intromodulecontextid']) && $structure[0]['intromodulecontextid'])) {
                     if ($introimgurl = tur_get_course_intro_image($structure[0]['intromodulecontextid'])) {
@@ -263,14 +276,16 @@ class format_turforlag_renderer extends format_section_renderer_base {
                         $html .= html_writer::div($introhtml, 'turforlag_cf_tabbackground_text');
                     }
                 }
-            }
-            if (array_key_exists('parts', $structure[$sectionid])) {
+            } else if (array_key_exists('parts', $structure[$sectionid])) {
                 $attributes = array('id' => 'subtabs-' . $sectionid);
                 $html .= html_writer::start_div('',
                         array('id' => 'subtabs-' . $sectionid, 'class' => 'turforlag_subtabs'));
                 $html .= $this->generate_turforlag_subtabs_html($structure, $sectionid);
                 $html .= $this->generate_turforlag_subtabcontent_html($structure, $sectionid);
                 $html .= html_writer::end_div();
+            } else {
+                $html .= html_writer::tag('p', get_string('no-section-parts-1', 'format_turforlag'));
+                $html .= html_writer::tag('p', get_string('no-section-parts-2', 'format_turforlag'));
             }
             $html .= html_writer::end_div();
         }
