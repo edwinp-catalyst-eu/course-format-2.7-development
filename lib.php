@@ -357,7 +357,7 @@ function turforlag_tabcontent_background_style($contextid=null) {
         'display' => 'none'
     );
     if ($contextid) {
-        $styles['background-image'] = turforlag_tabcontent_background_img($contextid);
+        $styles['background-image'] = 'url("' . turforlag_tabcontent_background_img($contextid) . '")';
         $styles['background-position'] = 'right bottom';
         $styles['background-repeat'] = 'no-repeat';
     }
@@ -369,14 +369,14 @@ function turforlag_tabcontent_background_style($contextid=null) {
 }
 
 function turforlag_tabcontent_background_img($contextid) {
+    global $CFG;
 
     $fs = get_file_storage();
     $files = $fs->get_area_files($contextid, 'mod_resource', 'content', 0);
     if ($file = end($files)) {
         $filename = $file->get_filename();
         if ($filename != '.') {
-            return moodle_url::make_file_url('/pluginfile.php',
-                    "/{$contextid}/mod_resource/content/0/{$filename}");
+            return $CFG->wwwroot . "/pluginfile.php/{$contextid}/mod_resource/content/0/{$filename}";
         }
     }
 }
