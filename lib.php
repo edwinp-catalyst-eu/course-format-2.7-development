@@ -350,15 +350,17 @@ function tur_get_course_intro($courseid) {
             array('course' => $courseid, 'name' => '_introduction'));
 }
 
-function turforlag_tabcontent_background_style() {
+function turforlag_tabcontent_background_style($contextid=null) {
 
     $inlinestyle = '';
     $styles = array(
-        'background-image' => turforlag_tabcontent_background_img(),
-        'background-position' => 'right bottom',
-        'background-repeat' => 'no-repeat',
         'display' => 'none'
     );
+    if ($contextid) {
+        $styles['background-image'] = turforlag_tabcontent_background_img($contextid);
+        $styles['background-position'] = 'right bottom';
+        $styles['background-repeat'] = 'no-repeat';
+    }
     foreach ($styles as $stylename => $stylevalue) {
         $inlinestyle .= $stylename . ': ' . $stylevalue . ';';
     }
@@ -366,10 +368,17 @@ function turforlag_tabcontent_background_style() {
     return $inlinestyle;
 }
 
-function turforlag_tabcontent_background_img() {
+function turforlag_tabcontent_background_img($contextid) {
 
-    // temporary development url
-    return 'url(http://staging27.turteori.dk/pluginfile.php/3280/mod_resource/content/1/backgroundstruck-2.png);';
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($contextid, 'mod_resource', 'content', 0);
+    if ($file = end($files)) {
+        $filename = $file->get_filename();
+        if ($filename != '.') {
+            return moodle_url::make_file_url('/pluginfile.php',
+                    "/{$contextid}/mod_resource/content/0/{$filename}");
+        }
+    }
 }
 
 function tur_course_structure($courseid) {
@@ -397,7 +406,6 @@ function tur_course_structure($courseid) {
             $params['contextlevel'] = CONTEXT_MODULE;
             $params['modulename'] = 'resource';
             $params['resourcename'] = '_introduction';
-
             $structure[0]['status'] = 'intro';
             $structure[0]['courseid'] = $courseid;
             if ($intromodulecontextid = $DB->get_field_sql($sql, $params)) {
@@ -413,6 +421,8 @@ function tur_course_structure($courseid) {
             $sql = "SELECT DISTINCT cm.id, cm.indent,
                             l.name AS labelname,
                             q.name AS quizname,
+                            r.name AS resourcename,
+                            ctx.id AS contextid,
                             qa.attempt AS quizattempt,
                             CASE
                                 WHEN qa.state IS NOT NULL THEN
@@ -436,10 +446,12 @@ function tur_course_structure($courseid) {
                  LEFT JOIN {scorm_scoes_track} sst ON (sst.scormid = s.id
                                 AND sst.element = 'cmi.core.lesson_status'
                                 AND sst.userid = {$USER->id})
+                 LEFT JOIN {context} ctx ON (ctx.instanceid = cm.id)
+                 LEFT JOIN {files} f ON (f.contextid = ctx.id)
+                 LEFT JOIN {resource} r ON (r.id = cm.instance AND r.name = '_tabbackground' AND f.id IS NOT NULL)
                      WHERE cm.id {$sequencesql}
                        AND cm.visible = 1 ";
-
-            $sql .=  " ORDER BY CASE cm.id ";
+            $sql .= " ORDER BY CASE cm.id ";
             $sequencearray = explode(',', $section->sequence);
             for ($i = 0; $i < count($sequencearray); $i++) {
                 $sql .= 'WHEN ' . $sequencearray[$i] . ' THEN ' . $i . ' ';
@@ -491,6 +503,9 @@ function tur_course_structure($courseid) {
                             }
                             $structure[$sectionid]['parts'][$i]['status'] = $scormstate;
                             $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
+                        }
+                        if ($sectionmodules[$i]->resourcename == '_tabbackground') {
+                            $structure[$sectionid]['backgroundcontextid'] = $sectionmodules[$i]->contextid;
                         }
                         $parent = $i;
                         break;

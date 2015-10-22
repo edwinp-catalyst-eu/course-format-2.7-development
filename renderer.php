@@ -255,10 +255,14 @@ class format_turforlag_renderer extends format_section_renderer_base {
 
         $html = '';
         foreach ($structure as $sectionid => $section) {
+            $backgroundcontextid = null;
+            if (isset($structure[$sectionid]['backgroundcontextid'])) {
+                $backgroundcontextid = $structure[$sectionid]['backgroundcontextid'];
+            }
             $html .= html_writer::start_div('turforlag_cf_content',
                     array(
                         'id' => 'tabs-' . $sectionid,
-                        'style' => turforlag_tabcontent_background_style()
+                        'style' => turforlag_tabcontent_background_style($backgroundcontextid)
                     ));
             $title = ($sectionid !=0 &&
                     !array_key_exists('parts', $structure[$sectionid])) ?
@@ -297,7 +301,6 @@ class format_turforlag_renderer extends format_section_renderer_base {
 
         $html = html_writer::start_tag('ul', array('class' => 'turforlag_subtabs'));
         foreach ($structure[$sectionid]['parts'] as $subtabid => $subtab) {
-            
             $class = 'turforlag_status_' . $subtab['status'];
             if (!isset($subtab['modules'])) {
                 $url = new moodle_url("/mod/{$subtab['type']}/view.php",
