@@ -297,6 +297,7 @@ class format_turforlag_renderer extends format_section_renderer_base {
 
         $html = html_writer::start_tag('ul', array('class' => 'turforlag_subtabs'));
         foreach ($structure[$sectionid]['parts'] as $subtabid => $subtab) {
+            
             $class = 'turforlag_status_' . $subtab['status'];
             if (!isset($subtab['modules'])) {
                 $url = new moodle_url("/mod/{$subtab['type']}/view.php",
@@ -318,20 +319,22 @@ class format_turforlag_renderer extends format_section_renderer_base {
 
         $html = '';
         foreach ($structure[$sectionid]['parts'] as $subtabid => $subtab) {
-            $html .= html_writer::start_div('turforlag_cf_subcontent',
-                    array('id' => "subtabs-{$sectionid}-{$subtabid}"));
-            $html .= html_writer::start_tag('ul');
             if (isset($structure[$sectionid]['parts'][$subtabid]['modules'])) {
-                foreach ($structure[$sectionid]['parts'][$subtabid]['modules'] as $moduleid => $module) {
-                    $url = new moodle_url("/mod/{$module['type']}/view.php",
-                            array('id' => $moduleid));
-                    $link = html_writer::link($url, $module['name']);
-                    $html .= html_writer::tag('li', $link,
-                            array('class' => 'turforlag_status_' . $module['status']));
+                $html .= html_writer::start_div('turforlag_cf_subcontent',
+                        array('id' => "subtabs-{$sectionid}-{$subtabid}"));
+                $html .= html_writer::start_tag('ul');
+                if (isset($structure[$sectionid]['parts'][$subtabid]['modules'])) {
+                    foreach ($structure[$sectionid]['parts'][$subtabid]['modules'] as $moduleid => $module) {
+                        $url = new moodle_url("/mod/{$module['type']}/view.php",
+                                array('id' => $moduleid));
+                        $link = html_writer::link($url, $module['name']);
+                        $html .= html_writer::tag('li', $link,
+                                array('class' => 'turforlag_status_' . $module['status']));
+                    }
                 }
+                $html .= html_writer::end_tag('ul');
+                $html .= html_writer::end_div();
             }
-            $html .= html_writer::end_tag('ul');
-            $html .= html_writer::end_div();
         }
 
         return $html;
