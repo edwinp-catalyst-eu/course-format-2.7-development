@@ -501,13 +501,35 @@ function tur_course_structure($courseid) {
                         if ($sectionmodules[$i]->quizname && isset($structure[$sectionid]['parts'][$parent]['name'])) {
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->quizname;
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'quiz';
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = $sectionmodules[$i]->quizstate;
+                            switch ($sectionmodules[$i]->quizstate) {
+                                case 'finished':
+                                    $quizstate = 'completed';
+                                    break;
+                                case 'inprogress':
+                                    $quizstate = 'inprogress';
+                                    break;
+                                default:
+                                    $quizstate = 'unstarted';
+                                    break;
+                            }
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = $quizstate;
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['moduleid'] = $sectionmodules[$i]->id;
                         }
                         if ($sectionmodules[$i]->scormname && isset($structure[$sectionid]['parts'][$parent]['name'])) {
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->scormname;
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'scorm';
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = $sectionmodules[$i]->scormstate;
+                            switch ($sectionmodules[$i]->scormstate) {
+                                case 'completed':
+                                    $scormstate = 'completed';
+                                    break;
+                                case 'incomplete':
+                                    $scormstate = 'inprogress';
+                                    break;
+                                default:
+                                    $scormstate = 'unstarted';
+                                    break;
+                            }
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = $scormstate;
                             $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['moduleid'] = $sectionmodules[$i]->id;
                         }
                         break;
