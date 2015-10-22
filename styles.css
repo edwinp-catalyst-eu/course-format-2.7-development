@@ -60,6 +60,7 @@
     text-decoration: none;
     font-weight: normal;
     color: #000000;
+    max-width: 110px;
 }
 
 /* SUB TABS */
@@ -150,6 +151,7 @@
 }
 
 .turforlag_cf_subcontent ul {
+    margin-top: -5px;
     margin-left: 30px;
 }
 

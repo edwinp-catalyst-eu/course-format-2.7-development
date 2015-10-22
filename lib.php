@@ -356,7 +356,8 @@ function turforlag_tabcontent_background_style() {
     $styles = array(
         'background-image' => turforlag_tabcontent_background_img(),
         'background-position' => 'right bottom',
-        'background-repeat' => 'no-repeat'
+        'background-repeat' => 'no-repeat',
+        'display' => 'none'
     );
     foreach ($styles as $stylename => $stylevalue) {
         $inlinestyle .= $stylename . ': ' . $stylevalue . ';';
