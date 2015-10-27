@@ -301,7 +301,8 @@ class format_turforlag_renderer extends format_section_renderer_base {
 
         $html = html_writer::start_tag('ul', array('class' => 'turforlag_subtabs'));
         foreach ($structure[$sectionid]['parts'] as $subtabid => $subtab) {
-            $class = 'turforlag_status_' . $subtab['status'];
+            $class = (array_key_exists('status', $subtab)) ?
+                    'turforlag_status_' . $subtab['status'] : null;
             if (!isset($subtab['modules'])) {
                 $url = new moodle_url("/mod/{$subtab['type']}/view.php",
                         array('id' => $subtab['moduleid']));

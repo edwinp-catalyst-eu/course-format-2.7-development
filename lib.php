@@ -596,16 +596,18 @@ function tur_course_structure($courseid) {
                 $unstartedsections = array();
 
                 foreach ($section['parts'] as $partid => $part) {
-                    switch ($part['status']) {
-                        case 'inprogress':
-                            $inprogresssections[] = $partid;
-                            break;
-                        case 'completed':
-                            $completedsections[] = $partid;
-                            break;
-                        default:
-                            $unstartedsections[] = $partid;
-                            break;
+                    if (array_key_exists('status', $part)) {
+                        switch ($part['status']) {
+                            case 'inprogress':
+                                $inprogresssections[] = $partid;
+                                break;
+                            case 'completed':
+                                $completedsections[] = $partid;
+                                break;
+                            default:
+                                $unstartedsections[] = $partid;
+                                break;
+                        }
                     }
                 }
 
