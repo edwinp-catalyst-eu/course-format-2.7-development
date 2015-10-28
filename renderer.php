@@ -221,7 +221,7 @@ class format_turforlag_renderer extends format_section_renderer_base {
 
     public function generate_turforlag_course_format_html($structure) {
 
-        echo html_writer::start_div('', array('id' => 'tabs'));
+        echo html_writer::start_div('clearfix', array('id' => 'tabs'));
         echo $this->generate_turforlag_tabs_html($structure);
         echo $this->generate_turforlag_tabcontent_html($structure);
         echo html_writer::end_div();
