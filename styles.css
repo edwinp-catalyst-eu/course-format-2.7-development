@@ -131,6 +131,7 @@
     border-style: solid;
     border-width: 1px;
     float: left;
+    min-height: 550px;
 }
 
 .turforlag_cf_content h3 {
