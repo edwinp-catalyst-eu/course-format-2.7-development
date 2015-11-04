@@ -553,6 +553,9 @@ function tur_course_structure($courseid) {
 
             if (isset($structure[$sectionid]['parts'])) {
                 foreach ($structure[$sectionid]['parts'] as $sectionpartid => $sectionpart) {
+                    if ($sectionpart['type'] == 'label' && !array_key_exists('modules', $sectionpart)) {
+                        unset($structure[$sectionid]['parts'][$sectionpartid]);
+                    }
                     if (array_key_exists('modules', $sectionpart)) {
 
                         $inprogressmodules = array();
