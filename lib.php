@@ -446,7 +446,7 @@ function tur_course_structure($courseid) {
                  LEFT JOIN {scorm_scoes_track} sst ON (sst.scormid = s.id
                                 AND sst.element = 'cmi.core.lesson_status'
                                 AND sst.userid = {$USER->id})
-                 LEFT JOIN {context} ctx ON (ctx.instanceid = cm.id)
+                 LEFT JOIN {context} ctx ON (ctx.instanceid = cm.id AND ctx.contextlevel = ?)
                  LEFT JOIN {files} f ON (f.contextid = ctx.id)
                  LEFT JOIN {resource} r ON (r.id = cm.instance AND r.name = '_tabbackground' AND f.id IS NOT NULL)
                      WHERE cm.id {$sequencesql}
@@ -457,6 +457,8 @@ function tur_course_structure($courseid) {
                 $sql .= 'WHEN ' . $sequencearray[$i] . ' THEN ' . $i . ' ';
             }
             $sql .= 'END';
+
+            $params[] = CONTEXT_MODULE;
 
             $sectionmodules = $DB->get_records_sql($sql, $params);
             $sectionmodules = array_values($sectionmodules);
