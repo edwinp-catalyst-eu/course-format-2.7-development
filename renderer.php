@@ -230,6 +230,7 @@ class format_turforlag_renderer extends format_section_renderer_base {
     public function generate_turforlag_tabs_html($structure) {
 
         $html = html_writer::start_tag('ul', array('class' => 'turforlag_tabs'));
+        $i = 0;
         foreach ($structure as $sectionid => $section) {
             $link = html_writer::link('#tabs-' . $sectionid, $section['section']);
             $totaltabs = count($structure);
@@ -243,8 +244,10 @@ class format_turforlag_renderer extends format_section_renderer_base {
             $html .= html_writer::tag('li', $link,
                         array(
                             'class' => 'turforlag_status_' . $section['status'],
-                            'style' => 'line-height: ' . $lineheight .';'
+                            'style' => 'line-height: ' . $lineheight .';',
+                            'data-turtab' => $i
                         ));
+            $i++;
         }
         $html .= html_writer::end_tag('ul');
 
@@ -300,6 +303,7 @@ class format_turforlag_renderer extends format_section_renderer_base {
     public function generate_turforlag_subtabs_html($structure, $sectionid) {
 
         $html = html_writer::start_tag('ul', array('class' => 'turforlag_subtabs'));
+        $i = 0;
         foreach ($structure[$sectionid]['parts'] as $subtabid => $subtab) {
             $class = (array_key_exists('status', $subtab)) ?
                     'turforlag_status_' . $subtab['status'] : null;
@@ -312,7 +316,10 @@ class format_turforlag_renderer extends format_section_renderer_base {
                 $url = "#subtabs-{$sectionid}-{$subtabid}";
                 $link = html_writer::link($url, $subtab['name']);
             }
-            $html .= html_writer::tag('li', $link, array('class' => $class));
+            $html .= html_writer::tag('li', $link, array(
+                                                        'class' => $class,
+                                                        'data-tursubtab' => $i));
+            $i++;
         }
         $html .= html_writer::end_tag('ul');
 

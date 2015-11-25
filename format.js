@@ -96,21 +96,41 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
 }
 
 $(function() {
-    var activetabs = window.location.hash.split("-");
-    var toptab = 0;
-    var subtab = false;
 
-    if (activetabs[0] == "#subtabs") {
-        if (activetabs[1] != null) {
-            toptab = activetabs[1];
-        }
-        if (activetabs[2] != null) {
-            subtab = activetabs[2];
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) {
+            return parts.pop().split(";").shift();
+        } else {
+            return null;
         }
     }
 
+    function getUrlVars() {
+        var vars = [], hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+
+        for(var i = 0; i < hashes.length; i++)
+        {
+            hash = hashes[i].split('=');
+        hash[1] = unescape(hash[1]);
+        vars.push(hash[0]);
+            vars[hash[0]] = hash[1];
+        }
+
+        return vars;
+    }
+
+    var courseID = getUrlVars()["id"];
+    var toptab = getCookie("turtab" + courseID) ? getCookie("turtab" + courseID) : 0;
+    var subtab = getCookie("tursubtab" + courseID) ? getCookie("tursubtab" + courseID) : false;
+
     $('#tabs').tabs({
-        active: toptab
+        active: toptab,
+        activate: function(e, ui) {
+            document.cookie = "turtab" + courseID + "=" + (ui.newTab.attr('data-turtab'));
+        }
     });
 
     $('.turforlag_subtabs').tabs({
@@ -118,6 +138,7 @@ $(function() {
         collapsible: true,
         activate: function(e, ui) {
             ui.newPanel.css('margin-top', ui.newTab.position().top);
+            document.cookie = "tursubtab" + courseID + "=" + (ui.newTab.attr('data-tursubtab'));
         },
         create: function(e, ui) {
             if (ui.tab.position()) {
