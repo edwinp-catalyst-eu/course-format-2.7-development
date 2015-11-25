@@ -418,7 +418,7 @@ function tur_course_structure($courseid) {
 
             list($sequencesql, $params) = $DB->get_in_or_equal(explode(',', $section->sequence));
 
-            $sql = "SELECT DISTINCT cm.id, cm.indent,
+            $sql = "SELECT DISTINCT ctx.id AS id, cm.id AS cmid, cm.indent,
                             l.name AS labelname,
                             q.name AS quizname,
                             r.name AS resourcename,
@@ -468,7 +468,7 @@ function tur_course_structure($courseid) {
                         if ($sectionmodules[$i]->labelname) {
                             $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->labelname;
                             $structure[$sectionid]['parts'][$i]['type'] = 'label';
-                            $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
+                            $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->cmid;
                         }
                         if ($sectionmodules[$i]->quizname) {
                             $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->quizname;
@@ -485,7 +485,7 @@ function tur_course_structure($courseid) {
                                     break;
                             }
                             $structure[$sectionid]['parts'][$i]['status'] = $quizstate;
-                            $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
+                            $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->cmid;
                         }
                         if ($sectionmodules[$i]->scormname) {
                             $structure[$sectionid]['parts'][$i]['name'] = $sectionmodules[$i]->scormname;
@@ -502,7 +502,7 @@ function tur_course_structure($courseid) {
                                     break;
                             }
                             $structure[$sectionid]['parts'][$i]['status'] = $scormstate;
-                            $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->id;
+                            $structure[$sectionid]['parts'][$i]['moduleid'] = $sectionmodules[$i]->cmid;
                         }
                         if ($sectionmodules[$i]->resourcename == '_tabbackground') {
                             $structure[$sectionid]['backgroundcontextid'] = $sectionmodules[$i]->contextid;
@@ -514,8 +514,8 @@ function tur_course_structure($courseid) {
                             $parent = $i;
                         }
                         if ($sectionmodules[$i]->quizname && isset($structure[$sectionid]['parts'][$parent]['name'])) {
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->quizname;
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'quiz';
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->cmid]['name'] = $sectionmodules[$i]->quizname;
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->cmid]['type'] = 'quiz';
                             switch ($sectionmodules[$i]->quizstate) {
                                 case 'finished':
                                     $quizstate = 'completed';
@@ -527,12 +527,12 @@ function tur_course_structure($courseid) {
                                     $quizstate = 'unstarted';
                                     break;
                             }
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = $quizstate;
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['moduleid'] = $sectionmodules[$i]->id;
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->cmid]['status'] = $quizstate;
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->cmid]['moduleid'] = $sectionmodules[$i]->cmid;
                         }
                         if ($sectionmodules[$i]->scormname && isset($structure[$sectionid]['parts'][$parent]['name'])) {
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['name'] = $sectionmodules[$i]->scormname;
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['type'] = 'scorm';
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->cmid]['name'] = $sectionmodules[$i]->scormname;
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->cmid]['type'] = 'scorm';
                             switch ($sectionmodules[$i]->scormstate) {
                                 case 'completed':
                                     $scormstate = 'completed';
@@ -544,8 +544,8 @@ function tur_course_structure($courseid) {
                                     $scormstate = 'unstarted';
                                     break;
                             }
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['status'] = $scormstate;
-                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->id]['moduleid'] = $sectionmodules[$i]->id;
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->cmid]['status'] = $scormstate;
+                            $structure[$sectionid]['parts'][$parent]['modules'][$sectionmodules[$i]->cmid]['moduleid'] = $sectionmodules[$i]->cmid;
                         }
                         break;
                 }
