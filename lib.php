@@ -417,6 +417,7 @@ function tur_course_structure($courseid) {
         if (isset($section->sequence) && $section->sequence) {
 
             list($sequencesql, $params) = $DB->get_in_or_equal(explode(',', $section->sequence));
+            $params[] = $courseid;
             $params[] = CONTEXT_MODULE;
 
             $sql = "SELECT DISTINCT ctx.id AS id, cm.id AS cmid, cm.indent,
@@ -452,6 +453,7 @@ function tur_course_structure($courseid) {
                  LEFT JOIN {resource} r ON (r.id = cm.instance AND r.name = '_tabbackground' AND f.id IS NOT NULL)
                      WHERE cm.id {$sequencesql}
                        AND cm.visible = 1
+                       AND cm.course = ?
                        AND ctx.contextlevel = ?
                   ORDER BY CASE cm.id ";
             $sequencearray = explode(',', $section->sequence);
