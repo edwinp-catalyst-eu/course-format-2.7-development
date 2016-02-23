@@ -438,7 +438,8 @@ function tur_course_structure($courseid) {
                                     sst.value
                                 WHEN sst.value IS NULL AND s.name IS NOT NULL THEN
                                     'unstarted'
-                            END AS scormstate
+                            END AS scormstate,
+                            sst.attempt AS scormattempt
                       FROM {course_modules} cm
                       JOIN {modules} m ON m.id = cm.module
                  LEFT JOIN {label} l ON (l.id = cm.instance AND m.name = 'label')
