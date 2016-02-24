@@ -420,7 +420,9 @@ function tur_course_structure($courseid) {
             $params[] = $courseid;
             $params[] = CONTEXT_MODULE;
 
-            $sql = "SELECT DISTINCT ctx.id AS id, cm.id AS cmid, cm.indent,
+            $sql = "SELECT DISTINCT CONCAT(ctx.id, COALESCE(sst.attempt,''), COALESCE(qa.attempt,'')) AS id,
+                            cm.id AS cmid,
+                            cm.indent,
                             l.name AS labelname,
                             q.name AS quizname,
                             r.name AS resourcename,
@@ -464,6 +466,79 @@ function tur_course_structure($courseid) {
             $sql .= 'END';
 
             $sectionmodules = $DB->get_records_sql($sql, $params);
+
+            // Build temporary array of section module context ids
+            // and build an array from any duplicates
+            $temparray = array();
+            foreach ($sectionmodules as $key => $value) {
+                $temparray[$key] = $value->contextid;
+            }
+            $duplicatesmids = array();
+            foreach (array_count_values($temparray) as $smid => $count) {
+                if ($count > 1) {
+                    $duplicatesmids[] = $smid;
+                }
+            }
+
+            foreach ($duplicatesmids as $duplicatesmid) { // could be more than one ;)
+                // Get the keys from the temporary array of the duplicates and
+                // create another temporary array - we need to check the attempt values
+                $duplicates = array();
+                $firstduplicatekey = null;
+                $array_intersect = array_intersect($temparray, array($duplicatesmid));
+                foreach ($array_intersect as $smkey => $smctxid) {
+                    $duplicates[$smkey] = $sectionmodules[$smkey];
+                    if (empty($firstduplicatekey)) {
+                        $firstduplicatekey = $smkey;
+                    }
+                }
+
+                // Get the module type
+                $sql = "SELECT m.name
+                          FROM {context} ctx
+                          JOIN {course_modules} cm ON cm.id = ctx.instanceid
+                          JOIN {modules} m ON m.id = cm.module
+                         WHERE ctx.id = ?";
+                $moduletype = $DB->get_field_sql($sql, array($duplicatesmid));
+
+                switch ($moduletype) {
+                    case 'scorm':
+
+                        // Declare a variable to hold the array key with the highest attempt value
+                        // Default this to the first item in the array of objects
+                        $highestattempt = $duplicates[$firstduplicatekey]->scormattempt;
+
+                        // Create an variable for the duplicates we want to keep
+                        // from the main section modules array
+                        $dupetokeep = null;
+
+                        // Dedupe the array based on attempt value
+                        foreach ($duplicates as $duplicateskey => $duplicate) {
+                            if ($duplicate->scormattempt > $highestattempt) {
+                                $highestattempt = $duplicate->scormattempt;
+                                $dupetokeep = $duplicateskey;
+                            }
+                        }
+
+                        // Iterate through the $array_intersect array
+                        // Remove items from the main submodules array items which
+                        // match keys from the array_intersect($temparray, $duplicatesmids) array
+                        // and which aren't the $dupetokeep
+                        foreach ($array_intersect as $dupekey => $dupevalue) {
+                            if ($dupekey != $dupetokeep) {
+                                unset($sectionmodules[$dupekey]);
+                            }
+                        }
+                        break;
+
+                    case 'quiz':
+                        break;
+                }
+            }
+
+            // No need for the temporary array any more
+            unset($temparray);
+
             $sectionmodules = array_values($sectionmodules);
 
             for ($i = 0; $i < count($sectionmodules); $i++) {
