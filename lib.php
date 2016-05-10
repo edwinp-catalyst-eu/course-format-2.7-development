@@ -429,6 +429,10 @@ function tur_course_structure($courseid) {
                             ctx.id AS contextid,
                             qa.attempt AS quizattempt,
                             CASE
+                                WHEN qa.state = 'finished' AND qa.sumgrades >= 8 THEN
+                                    'finished'
+                                WHEN qa.state = 'finished' AND qa.sumgrades < 8 THEN
+                                    'inprogress'
                                 WHEN qa.state IS NOT NULL THEN
                                     qa.state
                                 WHEN qa.state IS NULL AND q.name IS NOT NULL THEN
